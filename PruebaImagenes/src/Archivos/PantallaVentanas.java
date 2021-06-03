@@ -49,6 +49,7 @@ public class PantallaVentanas extends javax.swing.JFrame {
         this.setContentPane(fondo);
         initComponents();
         this.setLocationRelativeTo(null);
+        LLenarCbCompra();
         
         this.btnSaveChanges.setVisible(false);
         this.txtDNombreUsuario.setEditable(false);
@@ -69,6 +70,33 @@ public class PantallaVentanas extends javax.swing.JFrame {
         modelo.addColumn("Costo");
     }
     String[]botones={"Confirmar","Modificar","Cancelar"};
+    public void LLenarCbCompra(){
+        DefaultComboBoxModel tr = new DefaultComboBoxModel();
+        DefaultComboBoxModel ei = new DefaultComboBoxModel();
+        DefaultComboBoxModel ef = new DefaultComboBoxModel();
+        tr.addElement("SELECCIONAR");
+        try{
+            Connection miConexion = DriverManager.getConnection("jdbc:sqlserver://LAPTOP-3A3Q5S9M\\SQLEXPRESS:1433;databaseName=BEEL_BALAM", "sa", "ABCpiz12");
+            CallableStatement resConexion = miConexion.prepareCall("{call VER_TRAMO_NOM}");
+            CallableStatement resConexionEI;
+            CallableStatement resConexionEF;
+            ResultSet rtr = resConexion.executeQuery();
+            while(rtr.next()){
+                tr.addElement(rtr.getString(1));
+                resConexionEI=miConexion.prepareCall("{call VER_TRAMO_EI(?)}");
+                resConexionEI.setString(1,rtr.getString(1));
+                ResultSet eir = resConexionEI.executeQuery();
+                ei.addElement(eir.getString(1));
+                resConexionEF=miConexion.prepareCall("{call VER_TRAMO_EF(?)}");
+                resConexionEF.setString(1,rtr.getString(1));
+                ResultSet eif = resConexionEF.executeQuery();
+                ei.addElement(eif.getString(1));
+            }
+        }catch(Exception e){
+            System.out.println("Hubo un error en el llenado de tramo");
+        }
+        cbTramo.setModel(tr);
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -126,9 +154,7 @@ public class PantallaVentanas extends javax.swing.JFrame {
         jLabel13 = new javax.swing.JLabel();
         jLabel14 = new javax.swing.JLabel();
         cbTramo = new javax.swing.JComboBox<>();
-        cbEstIni = new javax.swing.JComboBox<>();
-        jLabel15 = new javax.swing.JLabel();
-        cbEstFin = new javax.swing.JComboBox<>();
+        cbDir = new javax.swing.JComboBox<>();
         jLabel16 = new javax.swing.JLabel();
         txtDia = new javax.swing.JTextField();
         txtMes = new javax.swing.JTextField();
@@ -516,7 +542,7 @@ public class PantallaVentanas extends javax.swing.JFrame {
 
         jLabel11.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel11.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel11.setText("ESTACIÓN INICIAL:");
+        jLabel11.setText("DIRECCIÓN:");
 
         jLabel12.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel12.setForeground(new java.awt.Color(255, 255, 255));
@@ -537,13 +563,7 @@ public class PantallaVentanas extends javax.swing.JFrame {
             }
         });
 
-        cbEstIni.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-
-        jLabel15.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jLabel15.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel15.setText("ESTACIÓN FINAL:");
-
-        cbEstFin.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cbDir.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         jLabel16.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel16.setForeground(new java.awt.Color(255, 255, 255));
@@ -615,15 +635,11 @@ public class PantallaVentanas extends javax.swing.JFrame {
                             .addGroup(jPanel4Layout.createSequentialGroup()
                                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(cbTramo, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(cbEstIni, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(cbDir, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(35, 35, 35)
-                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel15)
-                                    .addComponent(jLabel16))
+                                .addComponent(jLabel16)
                                 .addGap(39, 39, 39)
-                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(cbEstFin, 0, 119, Short.MAX_VALUE)
-                                    .addComponent(fecha, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                .addComponent(fecha, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(txtEdad, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(jPanel4Layout.createSequentialGroup()
                                 .addComponent(txtNombres, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -691,9 +707,7 @@ public class PantallaVentanas extends javax.swing.JFrame {
                 .addGap(15, 15, 15)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel11)
-                    .addComponent(cbEstIni, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel15)
-                    .addComponent(cbEstFin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(cbDir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel12)
@@ -1227,8 +1241,7 @@ public class PantallaVentanas extends javax.swing.JFrame {
     private javax.swing.JButton btnEdit;
     private javax.swing.JButton btnEliminarUsuario;
     private javax.swing.JButton btnSaveChanges;
-    private javax.swing.JComboBox<String> cbEstFin;
-    private javax.swing.JComboBox<String> cbEstIni;
+    private javax.swing.JComboBox<String> cbDir;
     private javax.swing.JComboBox<String> cbHorario;
     private javax.swing.JComboBox<String> cbNac;
     private javax.swing.JComboBox<String> cbTramo;
@@ -1239,7 +1252,6 @@ public class PantallaVentanas extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
-    private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel18;
